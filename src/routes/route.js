@@ -41,16 +41,3 @@ router.post('/check', function(req, res) {
     res.send(dataRes); 
 }); 
 module.exports = router;
-
-
-
-
-
-
-
-
-// router.post("/post-query-1", function(req, res) {
-//     let input = req.query.votingAge
-//     let finalArr = persons.filter(ele => ele > input)
-//    res.send ({result: finalArr, votingStatus=true})
-// });
