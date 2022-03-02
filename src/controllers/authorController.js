@@ -9,10 +9,3 @@ const createAuthor = async (request, response) => {
 }
 
 module.exports.createAuthor = createAuthor
-
-
-
-
-
-
-
