@@ -1,24 +1,67 @@
 const { count } = require("console")
+const { response } = require("express")
+const { request } = require("http")
 const authorModel = require("../models/authorModel")
-const bookModel= require("../models/bookModel")
+const bookModel = require("../models/bookModel")
+const publisherModel = require("../models/publisherModel")
 
-const createBook= async function (req, res) {
-    let book = req.body
-    let bookCreated = await bookModel.create(book)
-    res.send({data: bookCreated})
+const mongoose = require('mongoose');
+const ObjectId = mongoose.Types.ObjectId;
+
+const createBook = async (request, response) => {
+    let data = request.body;
+    if (data.author == undefined || data.author == '') {
+        response.send({
+            'msg': "Author Id is required !"
+        });
+    }
+    else {
+        if (data.publisher == undefined || data.publisher == '') {
+            response.send({
+                'msg': "Publisher Id is required !"
+            });
+        }
+        else {
+            if (ObjectId.isValid(data.author) == false || ObjectId.isValid(data.publisher) == false) {
+                response.send({
+                    'msg': 'Enter a Valid Object Id !'
+                });
+            }
+            else {
+                const authorIdRes = await authorModel.findById(data.author);
+                if (authorIdRes != null) {
+                    const publisherIdRes = await publisherModel.findById(data.publisher);
+                    if (publisherIdRes != null) {
+                        const dataRes = await bookModel.create(data);
+                        response.send({
+                            'msg': dataRes
+                        })
+                    }
+                    else {
+                        response.send({
+                            'msg': "Publisher Id is not Found !"
+                        });
+                    }
+                }
+                else {
+                    response.send({
+                        'msg': "Author Id is not Found !"
+                    });
+                }
+            }
+        }
+    }
 }
 
-const getBooksData= async function (req, res) {
-    let books = await bookModel.find()
-    res.send({data: books})
+
+const getAllBooks = async (request, response) => {
+    const dataRes = await bookModel.find().populate(['author', 'publisher']);
+    response.send({
+        'msg': dataRes
+    });
 }
 
-const getBooksWithAuthorDetails = async function (req, res) {
-    let specificBook = await bookModel.find().populate('author_id')
-    res.send({data: specificBook})
 
-}
+module.exports.createBook = createBook
+module.exports.getAllBooks = getAllBooks
 
-module.exports.createBook= createBook
-module.exports.getBooksData= getBooksData
-module.exports.getBooksWithAuthorDetails = getBooksWithAuthorDetails
