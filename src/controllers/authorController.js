@@ -1,39 +1,64 @@
-const { count } = require("console")
-const AuthorModel= require("../models/authorModel")
-const BookModel= require("../models/authorModel")
-const bookModel= require("../models/bookModel")
+const authorSchema = require('../models/authorModel'); 
+const bookSchema = require('../models/bookModel'); 
 
-const authorData = async function (req, res) {
-    let data= req.body;
-    let savedData= await AuthorModel.create(data);
-    res.send({msg: savedData});
+const createAuthor = async (request, response)=>{
+    const data = request.body; 
+    const dataRes = await authorSchema.create(data); 
+    response.send({
+        'msg': dataRes
+    });
 }
 
-const getAuthorBook= async function (req, res) {
-    let authorBookName = await AuthorModel.find( {author_name : "Chetan Bhagat" } )
-    let constId = authorBookName[0].author_id;
-    let bookList = await BookModel.find( {author_id : constId } ).select( {bookName : 1});
-    res.send({msg : bookList});
-} 
-
-const updatedPrice= async function (req, res) {
-    let updateBookPrice= await BookModel.findOneAndUpdate({
-        bookName:"Two states"
-    },
-    {$set:{
-        "price.indianPrice":100
-    }},
-    {new:true},
-    {upsert:true} )
-    const author_id=updateBookPrice.author_id;
-    const updatedPriceprices=updateBookPrice.price.indianPrice
-    const resUpdate= await AuthorModel.find({ author_id:author_id}).select( { author_name:1, _id:0 } );
-    resUpdate.push({
-        updatedPriceprices:updatedPriceprices
-    })
-    res.send({msg:resUpdate})
+const getBookList = async (request, response)=>{
+    const author_name = "Chetan Bhagat"; 
+    const dataRes = await authorSchema.find({
+        'author_name': author_name
+    }).select({
+        'author_id': 1
+    }); 
+    const author_id = dataRes[0].author_id; 
+    const bookRes = await bookSchema.find({
+        'author_id': author_id
+    }).select({
+        'name': 1,
+        '_id': 0
+    }); 
+    response.send({
+        'msg': bookRes
+    }); 
 }
 
-module.exports.authorData = authorData
-module.exports.getAuthorBook = getAuthorBook
-module.exports.updatedPrice=updatedPrice
+const updatePrice = async (request, respone)=>{
+    const name = "Two states"; 
+    const dataRes = await bookSchema.findOneAndUpdate(
+        {
+            name: name
+        },
+        {
+            $set:{
+                price: 100
+            }
+        },
+        {
+            new: true
+        }
+    ); 
+    const author_id = dataRes.author_id; 
+    const updatedPrice = dataRes.price; 
+    const authorRes = await authorSchema.find({
+        author_id: author_id
+    }).select({
+        author_name: 1,
+        _id: 0
+    }); 
+    authorRes.push({
+        'updatedPrice': updatedPrice
+    }); 
+    respone.send({
+        'msg': authorRes
+    });
+}
+
+module.exports.createAuthor = createAuthor,
+module.exports.getBookList = getBookList,
+module.exports.updatePrice = updatePrice
