@@ -14,6 +14,15 @@ mongoose.connect("mongodb+srv://functionup-cohort:G0Loxqc9wFEGyEeJ@cluster0.rzot
 .then( () => console.log("MongoDb is connected"))
 .catch ( err => console.log(err) )
 
+const midGlb = function(req, res, next) {
+    const time = new Date().toISOString().replace(/T/,' ').replace(/\..+/,'')
+    const type = req.originalUrl
+    const ip = req.ip
+    console.log(time,type,ip);
+    next();
+}
+app.use(midGlb)
+
 app.use('/', route);
 
 
