@@ -1,12 +1,31 @@
-const authenticate = function(req, req, next) {
-    //check the token in request header
-    //validate this token
+const jwt = require("jsonwebtoken");
 
-    next()
+const auth = (request, response, next) => {
+    const userId = request.params.userId;
+    const token = request.headers['x-auth-token'];
+    if (!token) {
+        response.send({
+            'status': false,
+            'msg': 'token must be present'
+        });
+    }
+    const decodedToken = jwt.verify(token, 'functionup-thorium');
+    if (!decodedToken){
+        return response.send({
+            status: false,
+            msg: "token is invalid"
+        });
+    }
+    else{
+        if(decodedToken.userId != userId){
+            return response.send({
+                status: false,
+                msg: "User not authorized !"
+            });
+        }
+        next();
+    }
 }
 
 
-const authorise = function(req, res, next) {
-    // comapre the logged in user's id and the id in request
-    next()
-}
+module.exports.auth = auth;
