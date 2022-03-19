@@ -12,7 +12,7 @@ router.get("/test-me", function (req, res) {
 router.post('/createAuthors', authorController.createAuthor)
 router.post('/login', authorController.login)
 
-router.post('/createBlogs',middleware.authenticate, blogController.createBlog)
+router.post('/createBlogs',middleware.authenticate,middleware.authorise, blogController.createBlog)
 router.get('/getBlogs',middleware.authenticate, blogController.getBlog)
 router.put('/updateBlogs/:blogId',middleware.authenticate, middleware.authorisation, blogController.updateBlog)
 router.delete('/deleteBlogs/:blogId',middleware.authenticate, middleware.authorisation, blogController.deleteId)
